@@ -1,5 +1,10 @@
 const operations:string[] = ['plus', 'minus', 'multiplied', 'divided']
-
+const betterOperations: { [key in 'plus' | 'minus' | 'multiplied' | 'divided']: Function } = {
+  plus: (a: number, b: number): number => a + b,
+  minus: (a: number, b: number): number => a - b,
+  multiplied: (a: number, b: number): number => a * b,
+  divided: (a: number, b: number): number => a / b,
+}
 export const answer = (question:string):number => {
   const problem:string[] = question
     .replace("What is", "")
@@ -19,30 +24,21 @@ export const answer = (question:string):number => {
     for (const x of Array(Math.floor(problem.length/2)).keys()) {
       let calc_index:number = ((x+1) * 2) - 1
       if (calc_index == 1){
-        if (operations.includes(problem[1])){
-          if (problem[1] == "plus"){
-            ans = parseInt(problem[0]) + parseInt(problem[2])
-          } else if (problem[1] == "minus"){
-            ans = parseInt(problem[0]) - parseInt(problem[2])
-          } else if (problem[1] == "multiplied"){
-            ans = parseInt(problem[0]) * parseInt(problem[2])
-          } else if (problem[1] == "divided"){
-            ans = parseInt(problem[0]) / parseInt(problem[2])
-          }
+        const operator = problem[1];
+        if (operator in betterOperations) {
+          const operation = betterOperations[operator as keyof typeof betterOperations];
+          const operand1 = parseInt(problem[0]);
+          const operand2 = parseInt(problem[2]);
+          ans = operation(operand1, operand2);
         } else {
           throw new Error("Syntax error")
         }
       } else {
-        if (operations.includes(problem[calc_index])){
-          if (problem[calc_index] == "plus"){
-            return ans + parseInt(problem[calc_index+1])
-          } else if (problem[calc_index] == "minus"){
-            return ans - parseInt(problem[calc_index+1])
-          } else if (problem[calc_index] == "multiplied"){
-            return ans * parseInt(problem[calc_index+1])
-          } else if (problem[calc_index] == "divided"){
-            return ans / parseInt(problem[calc_index+1])
-          }
+        const operator = problem[calc_index];
+        if (operator in betterOperations) {
+          const operation = betterOperations[operator as keyof typeof betterOperations];
+          const operand2 = parseInt(problem[calc_index+1]);
+          ans = operation(ans, operand2);
         } else {
           throw new Error("Syntax error")
         }
